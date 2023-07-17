@@ -1,6 +1,4 @@
-# Gráficos de datos
-
-## TALLER SAN MARCOS
+# Gráficos de datos - TALLER SAN MARCOS
 
 ### Noviembre - Visualización de datos
 
