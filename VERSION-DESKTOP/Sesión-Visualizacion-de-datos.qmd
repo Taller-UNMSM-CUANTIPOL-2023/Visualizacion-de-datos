@@ -25,17 +25,26 @@ knitr::include_graphics("./images/logoCUANTIPOL.jpg")
 \newpage
 
 
-
+BUSCAR UNA DATA NUEVA
 
 
 # VARIABLES NOMINALES
 
 
-##VARIABLES ORDINALES
+
+
+## VARIABLES ORDINALES
 
 
 
-###VARIABLES NUMÉRICAS
+### VARIABLES NUMÉRICAS
+
+AGREGAR
+
+
+
+
+
 
 
 
