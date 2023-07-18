@@ -1,0 +1,41 @@
+---
+title: "**<b style = 'color : #E34B2A;'>Sesión : Visualización de datos</b>**"
+subtitle: 'Taller de Investigación: Política Cuantitativa "CUANTIPOL" - UNMSM'
+date: "2023-11-4"
+author: "Asesor: Joel Belsasar Ccallocunto \n **[@luccemhu](https://github.com/luccemhu)** \n a20196510@pucp.edu.pe"
+theme:
+  dark: darkly
+  light: flatly
+toc: true
+always_allow_html: true
+format:
+  html:
+    mainfont: Georgia
+    self-contained: true
+include-in-header: header-hu.html
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+```
+```{r,echo=FALSE, out.width="65%",fig.align="center"}
+knitr::include_graphics("./images/logoCUANTIPOL.jpg")
+```
+
+\newpage
+
+
+
+
+
+# VARIABLES NOMINALES
+
+
+##VARIABLES ORDINALES
+
+
+
+###VARIABLES NUMÉRICAS
+
+
+
