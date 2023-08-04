@@ -58,7 +58,7 @@ df_lapop <- read_stata("PER_2021_LAPOP.dta") |>
 **<b style = 'color : #50D050;'>Variable categórica nominal:</b>** `jc15a`
 ============================================================
 
-JC15A. ¿Cree usted que cuando el país enfrenta momentos muy difíciles, se justifica que el presidente del país cierre el Congreso y gobierne sin Congreso?
+*JC15A. ¿Cree usted que cuando el país enfrenta momentos muy difíciles, se justifica que el presidente del país cierre el Congreso y gobierne sin Congreso?*
 
 ```{r}
 str(df_lapop$jc15a)
@@ -266,7 +266,7 @@ p1 <- ggplot(df_lapop, aes(x = q1tb, y = confi_ins, color = q1tb)) +
   geom_boxplot() +
   theme(legend.position = "top", axis.text.y = element_blank(), panel.background=element_rect(fill = "white", colour = "white")) + 
   geom_jitter(shape = 16, position = position_jitter(0.2)) + 
-  labs(title = "El apoyo al sistema político según el sexo", x = "", y ="Index", subtitle = "", caption = "ENDO 2020") + scale_y_continuous(breaks = (1:100))
+  labs(title = "El apoyo al sistema político según el sexo", x = "", y ="Index", subtitle = "", caption = "@luccemhu") + scale_y_continuous(breaks = (1:100))
 ggplotly(p1)
 ```
 
