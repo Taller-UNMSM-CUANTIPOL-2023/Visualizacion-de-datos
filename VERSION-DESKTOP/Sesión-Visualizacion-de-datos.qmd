@@ -14,7 +14,6 @@ format:
     self-contained: true
 include-in-header: header-hu.html
 ---
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 ```
@@ -24,22 +23,259 @@ knitr::include_graphics("./images/logoCUANTIPOL.jpg")
 
 \newpage
 
+## Descarguemos e importemos la data:
 
-BUSCAR UNA DATA NUEVA
+El [Barómetro de las Américas](https://www.vanderbilt.edu/lapop/about-americasbarometer.php) es el proyecto más conocido de LAPOP. Este estudio es un estudio comparativo científicamente de valores y comportamientos democráticos que cubre todos los países independientes de América del Norte, Central y del Sur, así como un número significativo de países del Caribe. El trabajo de LAPOP en el Barómetro de las Américas incluye el diseño de encuestas, el diseño de muestras, la prueba previa cualitativa e iterativa de nuevos módulos, la auditoría de datos, el análisis y la elaboración de informes. 
 
+Utilizaremos la siguiente [data](http://datasets.americasbarometer.org/database/index.php?freeUser=true) del 2021 de [Vanderbilt University](https://www.vanderbilt.edu/lapop/raw-data.php)
+ para utilizar las principales funciones dentro de Tidyverse y las más útiles para nuestro trabajo en el taller.
 
-# VARIABLES NOMINALES
-
-
-
-
-## VARIABLES ORDINALES
+  - En este caso, todo se encuentra en la carpeta de la clase.
 
 
+# Instalamos y corremos los paquetes y librerías que utilizaremos:
+```{r setup}
+pacman::p_load(haven, # Import foreign statistical formats 
+               janitor, # Tools for examining and cleaning dirty data
+               plotly, #  Interactive web-based graph
+               ggplot2 # To map variables to aesthetics
+               )
+```
 
-### VARIABLES NUMÉRICAS
+```{r warning=FALSE}
+df_lapop <- read_stata("PER_2021_LAPOP.dta") |> 
+  clean_names() # akes and returns a data.frame
+#names(df_lapop) 
+#str(df_lapop)
+#class(df_lapop)
+```
 
-AGREGAR
+
+
+
+
+
+**<b style = 'color : #50D050;'>Variable categórica nominal:</b>** `jc15a`
+============================================================
+
+JC15A. ¿Cree usted que cuando el país enfrenta momentos muy difíciles, se justifica que el presidente del país cierre el Congreso y gobierne sin Congreso?
+
+```{r}
+str(df_lapop$jc15a)
+table(df_lapop$jc15a) # 1: 640, 2: 821
+
+# Eliminando casos perdidos:
+sum(is.na(df_lapop$jc15a)) # 1577 NA's
+df_congre = df_lapop[complete.cases(df_lapop$jc15a),]
+
+df_lapop = df_lapop[df_lapop$jc15a != 888888,] # No sabe
+df_lapop = df_lapop[df_lapop$jc15a != 988888,] # No responde
+df_lapop = df_lapop[df_lapop$jc15a != 999999,] # Inaplicable
+
+
+df_lapop$jc15a = as.factor(df_lapop$jc15a)
+
+df_lapop$jc15a = factor(df_lapop$jc15a, 
+                         levels = levels(df_lapop$jc15a), 
+                         labels = c("Si","No"), 
+                         ordered = F)
+str(df_lapop$jc15a)
+table(df_lapop$jc15a)
+```
+
+
+```{r eval=TRUE,fig.show='hold',fig.width=9.5,fig.height=5.55, fig.align="center",fig.cap="Entrevistados según la justificación del cierre del congreso."}
+#grafico1 <- table(df_lapop$jc15a) 
+grafico1 <- prop.table(table(df_lapop$jc15a))*100 # También se puede crear una grafica en porcentaje
+
+grafico1 = as.data.frame(grafico1) 
+colnames(grafico1) = c("Reg","Freq")
+
+library(ggplot2) 
+bp = ggplot(grafico1, aes(x = reorder(Reg,Freq), y = Freq, fill = Reg)) +
+  geom_bar(stat = "identity") +
+    coord_flip() + 
+    labs(title = "Entrevistados según si justifica el cierre del congreso", y = "% entrevistados", x = "Justifica el cierre al congreso", subtitle = "", caption = "LAPOP, PERU 2021") +
+    theme(plot.title = element_text(hjust = 1)) + 
+    theme(panel.background = element_rect(fill = "white", colour = "white")) + 
+    geom_text(aes(label = Freq), vjust = 0.5, color ="Black", size = 5)
+bp
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Variable Categórica ordinal: `m1`
+============================================================
+
+*M1. Hablando en general acerca del gobierno actual, ¿diría usted que el trabajo que está realizando el Presidente Francisco Sagasti es...?:*
+
+- Percepción respecto a la labor del presidente Vizcarra... 
+
+```{r}
+#str(df_lapop$m1)
+
+df_lapop$m1 = as.factor(df_lapop$m1)
+
+df_lapop$m1 = factor(df_lapop$m1,
+                     levels = levels(df_lapop$m1),
+                     labels = c("Muy bueno", "Bueno", "Regular", "Malo", 
+                                "Muy malo"),
+                     ordered = T) 
+#str(df_lapop$m1)
+```
+
+
+  - Graficas: Barras y boxplot 
+```{r message=FALSE,warning=FALSE,eval=TRUE,fig.show='hold',fig.width=9.5,fig.height=5.55, fig.align="center"}
+grafico5 <- table(df_lapop$m1) 
+# Creamos un objeto que contenga la tabla de frecuencias de la variable
+
+grafico5 = as.data.frame(grafico5) # Dataframe
+
+colnames(grafico5) = c("Reg", "Freq") # Renombrar
+
+#barplot(table(df_lapop$m1),col="darkblue", xlab=NULL, ylab="Conteo de encuestados", main="Percepción de satisfacción respecto a la labor del presidente Vizcarra") # Grafico basico de R
+
+library(ggplot2)
+bp4 = ggplot(grafico5, aes(x = reorder(Reg, Freq), # aes: Ascendentemente
+                           y = Freq, fill = Reg)) + 
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(title = 
+         "Percepción de satisfacción respecto a la labor del presidente Vizcarra", 
+       y = "Frecuencias", x = "Categorías") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  theme(panel.background = element_rect(fill = "white", colour = "white")) +
+  geom_text(aes(label = Freq),
+            vjust = 0.5,
+            color = "black",
+            size = 5) # Frecuencias en las barras
+bp4
+```
+
+```{r message=FALSE,warning=FALSE,eval=TRUE,fig.show='hold',fig.width=9.5,fig.height=5.55, fig.align="center"}
+
+p5 <- #boxplot(df_lapop$m1,col = "pink") # boxplot basico de R
+  
+  ggplot(df_lapop, aes(x = "", y = m1, color = m1)) +
+  geom_boxplot(outlier.shape = NA) + coord_flip() + #Volteamos el gráfico
+  
+  theme(legend.position = "top",
+        axis.text.y = element_blank(),
+        panel.background = element_rect(fill = "white", colour = "white")
+  ) + #Quitamos categorías
+  geom_jitter(width = 0.2,
+              colour = 2 ,
+              shape = 17,
+              size = 1) + #Agregamos los casos como puntos
+  
+  labs(title = "Percepción de satisfacción respecto a la labor del presidente Vizcarra", x =
+         "", y = "Percepción")
+p5 # Boxplot básico
+ggplotly(p5) # Boxplot dinámico
+```
+
+## **INTERPRETACION:** 
+  + La mayoría de personas considera que la labor del presidente Vizcarra ha sido regular. 
+  + El 2.90% de las personas considera que la labor del presidente vizcarra ha sido muy mala, mientras que el 3.79 considera que fue muy buena. En particular, el 50.27% de los encuestados, es decir, la mayoría considera que su labor fue regular. 
+
+
+
+
+
+
+
+VARIABLES NUMÉRICAS
+============================================================
+
+Creación del indicador confianza en las instituciones en el Perú:
+
+Definir qué es un sistema politico.
+
+qué significa apoyo
+
+Luego las personas que realizan las encuestas, a traves de una serie preguntas van a medir dicho concepto. cómo resumir dichas preguntas en un numero? - Indice aditivo: sumar las variables.
+
+Definimos las variables que conforman el indicador.
+
+de confianza en las instituciones,
+
+
+
+B13. ¿Hasta qué punto tiene confianza usted en el Congreso? 49
+
+B21. ¿Hasta qué punto tiene confianza usted en los partidos políticos? 51
+
+B32. ¿Hasta qué punto tiene usted confianza en su municipalidad? 52
+
+ B47A. ¿Hasta qué punto tiene usted confianza en las elecciones en este país? 54
+
+
+```{r}
+df_lapop[,c(49,51,52,54)] = lapply(df_lapop[,c(49,51,52,54)],as.numeric)
+
+df_lapop |> 
+  select(b13, b21, b32, b47a) |> 
+  summary()
+```
+
+```{r}
+df_lapop$confi_ins = df_lapop$b13 + df_lapop$b21 + df_lapop$b32 + df_lapop$b47a
+summary(df_lapop$confi_ins)
+```
+
+```{r}
+df_lapop$confi_ins = ((df_lapop$confi_ins-4)/23)*100 
+# Restamos el mínimo y divimos entre el máximo ya restado
+# y finalmente se multiplica * 100: (Indice aditivo de 0 a 100)
+
+#Resumen del indicador:
+summary(df_lapop$confi_ins)
+```
+
+
+```{r}
+# HIST:
+ggplot(df_lapop, aes(x = confi_ins, color = "")) + 
+  geom_histogram(breaks=seq(105), fill="white",alpha=0.5, position="identity") + 
+    labs(title = "Apoyo al sistema politico", y="", x="Index", subtitle = "", caption = "ENDO 2020")+
+    theme(plot.title = element_text(hjust = 0.5)) + 
+    theme(panel.background=element_rect(fill = "white", colour = "white"))
+```
+
+
+```{r}
+df_lapop <- df_lapop[!is.na(df_lapop$jc15a),] #Eliminando casos perdidos
+library(ggplot2)
+library(plotly)
+p1 <- ggplot(df_lapop, aes(x = q1tb, y = confi_ins, color = q1tb)) + 
+  geom_boxplot() +
+  theme(legend.position = "top", axis.text.y = element_blank(), panel.background=element_rect(fill = "white", colour = "white")) + 
+  geom_jitter(shape = 16, position = position_jitter(0.2)) + 
+  labs(title = "El apoyo al sistema político según el sexo", x = "", y ="Index", subtitle = "", caption = "ENDO 2020") + scale_y_continuous(breaks = (1:100))
+ggplotly(p1)
+```
+
+
+sex: q1tb
+
+```{r}
+df_lapop$q1tb <- as.factor(df_lapop$q1tb)
+```
 
 
 
