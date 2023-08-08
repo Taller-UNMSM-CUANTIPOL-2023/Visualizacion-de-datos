@@ -43,8 +43,8 @@ pacman::p_load(haven, # Import foreign statistical formats
 ```
 
 
-```{r warning=FALSE}
-df_lapop <- read_stata("https://github.com/Taller-UNMSM-CUANTIPOL-2023/Visualizacion-de-datos/raw/main/PER_2021_LAPOP.dta") |> 
+```{r}
+df_lapop <- read_stata("https://github.com/Taller-UNMSM-CUANTIPOL-2023/Visualizacion-de-datos/raw/main/documentos/PER_2021_LAPOP.dta") |> 
   clean_names() # Takes and returns a data.frame clean
 #names(df_lapop) 
 #str(df_lapop)
@@ -203,7 +203,7 @@ df_pre <- df_pre |>
 #df_pre
 ```
 
-## Graficas: Barras y boxplot 
+## Gráfica de barras: `percepcion`
 
 ```{r}
 bp2 = ggplot(df_pre, aes(x = reorder(percepcion, n), y = n,
@@ -218,31 +218,29 @@ bp2 = ggplot(df_pre, aes(x = reorder(percepcion, n), y = n,
     theme(plot.title = element_text(hjust = 0.8)) + # Centrar Título
     theme(panel.background = element_rect(fill = "white", colour = "white"))  +
     geom_text(aes(label = etiquetas), vjust = 1.5, color = "Black", size = 5)
-bp2
+#bp2
 ggplotly(bp)
 ```
 
 
 ## **Boxplot**
 ```{r message=FALSE,warning=FALSE,eval=TRUE,fig.show='hold',fig.width=9.5,fig.height=5.55, fig.align="center"}
+#boxplot(df_lapop$m1,col = "pink") # boxplot basico de R
 
-bp3 <- #boxplot(df_lapop$m1,col = "pink") # boxplot basico de R
-  
-  ggplot(df_pre, aes(x = "", y = percepcion, color = percepcion)) +
-  geom_boxplot(outlier.shape = NA) + coord_flip() + #Volteamos el gráfico
-  
+bp3 <- ggplot(df_pre, aes(x = "" , y = percepcion, color = "", shape = "")) +
+  geom_boxplot(outlier.shape = NA) + 
+  coord_flip() + # Volteamos el gráfico
   theme(legend.position = "top",
         axis.text.y = element_blank(),
-        panel.background = element_rect(fill = "white", colour = "white")
-  ) + #Quitamos categorías
+        panel.background = element_rect(fill = "white", 
+                                        colour = "white")) + # Quitamos categorías
   geom_jitter(width = 0.2,
               colour = 2 ,
               shape = 17,
               size = 1) + #Agregamos los casos como puntos
-  
-  labs(title = "Percepción de satisfacción respecto a la labor del presidente Vizcarra", x =
-         "", y = "Percepción")
-bp3
+  labs(title = "Percepción de satisfacción respecto a la labor del presidente Vizcarra", 
+       x = "", y = "Percepción")
+#bp3
 ggplotly(bp3) # Boxplot dinámico
 ```
 
@@ -253,7 +251,10 @@ ggplotly(bp3) # Boxplot dinámico
 
 
 
-
+```{r}
+#bp3 <- ggplot(df_lapop, aes(x = q1tb, y = m1, colour = q1tb, shape = q1tb))
+# + scale_shape_binned()
+```
 
 
 
@@ -288,10 +289,10 @@ B32. ¿Hasta qué punto tiene usted confianza en su municipalidad? 52
 
 
 ```{r}
-df_lapop[,c(49,51,52,54)] = lapply(df_lapop[,c(49,51,52,54)],as.numeric)
+df_lapop[, c(49, 51, 52, 54)] = lapply(df_lapop[, c(49, 51, 52, 54)], as.numeric)
 
-df_lapop |> 
-  select(b13, b21, b32, b47a) |> 
+df_lapop |>
+  select(b13, b21, b32, b47a) |>
   summary()
 ```
 
@@ -301,7 +302,7 @@ summary(df_lapop$confi_ins)
 ```
 
 ```{r}
-df_lapop$confi_ins = ((df_lapop$confi_ins-4)/23)*100 
+df_lapop$confi_ins = ((df_lapop$confi_ins - 4) / 23) * 100
 # Restamos el mínimo y divimos entre el máximo ya restado
 # y finalmente se multiplica * 100: (Indice aditivo de 0 a 100)
 
@@ -326,10 +327,8 @@ ggplotly(h)
 
 
 ```{r}
-df_lapop <- df_lapop[!is.na(df_lapop$sex),] #Eliminando casos perdidos
 
-
-bp2 <- ggplot(df_lapop, aes(x = sex, y = confi_ins, color = sex)) + 
+bp2 <- ggplot(df_lapop, aes(x = q1tb, y = confi_ins, color = q1tb)) + 
   geom_boxplot() + coord_flip() +
   theme(legend.position = "top", axis.text.y = element_blank(), 
         panel.background = element_rect(fill = "white", colour = "white")) + 
