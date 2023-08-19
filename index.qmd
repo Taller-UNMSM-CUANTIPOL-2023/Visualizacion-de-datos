@@ -44,7 +44,7 @@ pacman::p_load(haven, # Import foreign statistical formats
 
 
 ```{r}
-df_lapop <- read_stata("https://github.com/Taller-UNMSM-CUANTIPOL-2023/Visualizacion-de-datos/raw/main/documentos/PER_2021_LAPOP.dta") |> 
+df_lapop <- read_dta("https://github.com/Taller-UNMSM-CUANTIPOL-2023/Visualizacion-de-datos/raw/main/documentos/PER_2021_LAPOP.dta") |> 
   clean_names() # Takes and returns a data.frame clean
 
 #names(df_lapop) # Nombre de las variables del df
@@ -74,7 +74,7 @@ Recordemos:
 **<b style = 'color : #50D050;'>Variable categórica nominal:</b>** `jc15a` & `q1tb`
 ============================================================
 
-## *JC15A. ¿Cree usted que cuando el país enfrenta momentos muy difíciles, se justifica que el presidente del país cierre el Congreso y gobierne sin Congreso?*
+*JC15A. ¿Cree usted que cuando el país enfrenta momentos muy difíciles, se justifica que el presidente del país cierre el Congreso y gobierne sin Congreso?*
 
 ```{r}
 #str(df_lapop$jc15a)
@@ -138,7 +138,7 @@ ggplotly(bp)
 ```
 
 
-## *Q1TB. Para fines estadísticos, ¿me podría por favor decir cuál es su género?*
+*Q1TB. Para fines estadísticos, ¿me podría por favor decir cuál es su género?*
 
 ```{r}
 #str(df_lapop$q1tb)
@@ -182,7 +182,7 @@ pc = ggplot(df_pc, aes(x = "", y = pcnt, fill = sex)) +
          subtitle = "", caption = "LAPOP, PERU 2021", 
          fill = "¿Disolución del Congreso?")
 # Agregamos el título
-pc
+#pc
 ```
 
 ```{r}
@@ -285,7 +285,7 @@ bp3 <- ggplot(df_pre, aes(x = "", y = percepcion, color = "")) +
               size = 1) + # Agregamos los casos como puntos
   labs(title = "Percepción de satisfacción respecto a la labor del presidente Vizcarra", 
        x = "", y = "Percepción")
-bp3
+#bp3
 ggplotly(bp3) # Boxplot dinámico
 ```
 
@@ -345,7 +345,7 @@ summary(df_lapop$confi_ins)
 
 ## HISTOGRAMA: `confi_ins`
 ```{r}
-h <- ggplot(df_lapop, aes(x = confi_ins, color = 1)) + 
+h <- ggplot(df_lapop, aes(x = confi_ins)) + 
   geom_histogram(breaks = seq(100), fill = "blue", 
                  alpha = 0.5, position = "identity") + 
   labs(title = "Confianza en la instituciones", y = "", x = "Index", 
@@ -356,7 +356,7 @@ h <- ggplot(df_lapop, aes(x = confi_ins, color = 1)) +
              color = "blue",
              linetype = "dashed",
              size = 1)
-h 
+#h 
 ggplotly(h)
 ```
 
