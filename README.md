@@ -1,9 +1,7 @@
-# Gráficos de datos - TALLER SAN MARCOS
+# [Gráficos de datos - TALLER SAN MARCOS](https://taller-unmsm-cuantipol-2023.github.io/Visualizacion-de-datos/)
 
-### Noviembre - Visualización de datos
+Github pages aquí <- https://taller-unmsm-cuantipol-2023.github.io/Visualizacion-de-datos/
 
-SUBIR TODAS LAS DATAS A UTILIZAR Y OTROS MATERIALES
-
-JOEL Y LUCHO (INVITAR A EDITAR)
-
-comin soon raaaaa
+- Noviembre
+  
+comin soon
