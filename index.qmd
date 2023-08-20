@@ -30,19 +30,19 @@ El [Barómetro de las Américas](https://www.vanderbilt.edu/lapop/about-americas
 Utilizaremos la siguiente [data](http://datasets.americasbarometer.org/database/index.php?freeUser=true) del 2021 de [Vanderbilt University](https://www.vanderbilt.edu/lapop/raw-data.php)
  para utilizar las principales funciones dentro de Tidyverse y las más útiles para nuestro trabajo en el taller.
 
-  - En este caso, todo se encuentra en la carpeta de la clase.
-
 ## Instalamos y corremos los paquetes y librerías que utilizaremos:
 ```{r}
 pacman::p_load(haven, # Import foreign statistical formats 
                janitor, # Tools for examining and cleaning dirty data
                plotly, #  Interactive web-based graph
                ggplot2, # To map variables to aesthetics
-               tidyverse # Packages and tools for the R programming
+               tidyverse, # Packages and tools for the R programming
+               cowplot, # Comparar gráficas
+               ggridges # Gráfico de densidad de crestas
                )
 ```
 
-
+- Importamos desde Github:
 ```{r}
 df_lapop <- read_dta("https://github.com/Taller-UNMSM-CUANTIPOL-2023/Visualizacion-de-datos/raw/main/documentos/PER_2021_LAPOP.dta") |> 
   clean_names() # Takes and returns a data.frame clean
@@ -53,23 +53,49 @@ df_lapop <- read_dta("https://github.com/Taller-UNMSM-CUANTIPOL-2023/Visualizaci
 ```
 
 
-
 ### ggplot2
 
-Este paquete sirve para crear gráficos basados en la data seleccionada. También se le puede indicar una serie de parámetros como el color y tipo de letra, los títulos de los gráficos y más características que se indican con los comando.
+- Este paquete sirve para crear gráficos basados en la data seleccionada. También se le puede indicar una serie de parámetros como el color y tipo de letra, los títulos de los gráficos y más características que se indican con los comando.
 
+# Recordemos: 
 
+### Tipos de variables
 
+En las sesiones previas hemos estudiado estos tipos de variables:
 
++-------------------------+--------------------------------------------------------------------------------------------------------------------------------------+
+| **TIPO**                |        **DESCRIPCIÓN**                                                                                                               |
++=========================+======================================================================================================================================+
+|                         | - *Género*: Hombre=1, Mujer=2                                                                                                        |
+|                         |                                                                                                                                      |
+|                         | - *Religión*: Católico=1, Evangélico=2, Otro=3                                                                                       |
+| **Variables nominales** |                                                                                                                                      |
+|                         | - *Región*: Lima=1, Arequipa=2, La Libertad =3                                                                                       |  
+|                         |                                                                                                                                      |   
+|                         | - *Partido*: Perú Libre = 1, APP = 2, PPC = 3                                                                                        |  
++=========================+======================================================================================================================================+
+|                         | - *Educación*: Analf=0, Prim=1, Sec=2, Tec=3, Univ=4, Post=5                                                                         |
+|                         |                                                                                                                                      |        
+| **Variables ordinales** | - *Importancia de religión en su vida*: Nada importante=1, Poco importante=2, Algo importante=3, Muy importante=4                    |
+|                         |                                                                                                                                      |   
+|                         | - *Nivel de satisfacción con la democracia*: Muy instafisfecho=1, Insatisfecho=2, Satisfecho=3, Muy satisfecho=4                     |
++=========================+======================================================================================================================================+
+| **Variables continuas** | Estatura, peso, ingreso mensual, extensión, PBI per cápita, % de participación electoral.                                            |
++=========================+======================================================================================================================================+
+| **Variables discretas** | Número de hijos, edad, número de revocatorias, número de postas médicas, población.                                                  |
++-------------------------+--------------------------------------------------------------------------------------------------------------------------------------+
 
-Recordemos: 
+### En ese sentido, debemos crear gráficos según el tipo de variables de interés:
 
-- 
+```{r,echo=FALSE, out.width="110%",fig.align="center"}
+knitr::include_graphics("./images/graphs.png")
+```
 
+### Algo más: factores
 
+- En R, las variables nominales se denominan **factores**, las variables ordinales como **factores ordinales/ordenados **, es decir, pueden. 
 
-
-
+- Por otro lado, las variables continuas y discretas como **num**. En algunos casos, se puede encontrar lectura de variables como **int** (*interger*), que también son variables numéricas.
 
 **<b style = 'color : #50D050;'>Variable categórica nominal:</b>** `jc15a` & `q1tb`
 ============================================================
@@ -96,7 +122,7 @@ df_congre <- df_congre |>
   count() |>
   ungroup() |>
   mutate(pcnt = n / sum(n)) |> # Creamos una columna de proporción
-  arrange(pcnt) |> # Oderna descendentemente
+  arrange(pcnt) |> # Oderna ascendentemente
   mutate(etiquetas = scales::percent(pcnt)) # Otra columna con el porcentaje
 ```
 
@@ -148,6 +174,13 @@ ggplotly(bp)
 sum(is.na(df_lapop$q1tb)) # NA's: 0
 
 df_sex <- df_lapop |> 
+  filter(!is.na(q1tb)) |> # Borramos NA's de la columna 
+  mutate(sex = as.factor(q1tb)) |> 
+  mutate(sex = factor(sex, levels = levels(sex), 
+                               labels = c("Hombre","Mujer", "Otro")))
+
+# Guardemos también en la data principal:
+df_lapop <- df_lapop |> 
   filter(!is.na(q1tb)) |> # Borramos NA's de la columna 
   mutate(sex = as.factor(q1tb)) |> 
   mutate(sex = factor(sex, levels = levels(sex), 
@@ -272,7 +305,7 @@ rownames(df_pre) = df_pre$n # Etiquetas
 ```{r message=FALSE,warning=FALSE,eval=TRUE,fig.show='hold',fig.width=9.5,fig.height=5.55, fig.align="center"}
 #boxplot(df_pre$m1) # Boxplot basico de R
 
-bp3 <- ggplot(df_pre, aes(x = "", y = percepcion, color = "")) +
+bp3 <- ggplot(df_pre, aes(x = "", y = reorder(percepcion, n), color = "")) +
   geom_boxplot(outlier.shape = NA) + 
   coord_flip() + # Volteamos el gráfico
   scale_fill_brewer(palette = "Paired") +
@@ -290,11 +323,11 @@ ggplotly(bp3) # Boxplot dinámico
 ```
 
 ## **INTERPRETACION:** 
-  + La mayoría de personas considera que la labor del presidente Vizcarra ha sido regular. 
-  + El 2.90% de las personas considera que la labor del presidente vizcarra ha sido muy mala, mientras que el 3.79 considera que fue muy buena. En particular, el 50.27% de los encuestados, es decir, la mayoría considera que su labor fue regular. 
+  + La mayoría de personas considera que la labor del expresidente Sagasti ha sido regular. 
+  + El 2.90% de las personas considera que la labor del expresidente Sagasti ha sido muy mala, mientras que el 3.79 considera que fue muy buena. En particular, el 50.27% de los encuestados, es decir, la mayoría considera que su labor fue regular. 
 
 
-Variable númerica: `confi_ins`
+Variable númerica (Continuas o discretas): `confi_ins`
 ============================================================
 
 Creación del indicador confianza en las instituciones en el Perú:
@@ -339,6 +372,9 @@ df_lapop$confi_ins = ((df_lapop$confi_ins - 4) / 23) * 100
 # Restamos el mínimo y divimos entre el máximo ya restado
 # y finalmente se multiplica * 100: (Indice aditivo de 0 a 100)
 
+df_lapop <- df_lapop |> 
+  filter(!is.na(confi_ins)) # Eliminamos los NA's
+
 #Resumen del indicador:
 summary(df_lapop$confi_ins)
 ```
@@ -361,8 +397,6 @@ ggplotly(h)
 ```
 
 
-
-
 ## BOXPLOT: `confi_ins`
 ```{r}
 bp2 <- ggplot(df_lapop, aes(x = "", y = confi_ins, color = "")) + 
@@ -380,13 +414,78 @@ bp2 <- ggplot(df_lapop, aes(x = "", y = confi_ins, color = "")) +
 ggplotly(bp2)
 ```
 
-Y si agregamos... sex: q1tb
+### Y si agregamos... sex: q1tb?
+
+  - Recordemos que guardamos esta variable en una nueva columna. 
+
+## Violin Plot
+
+- Permite una comprensión de la propagación y la densidad de nuestros datos, pero hacerlo sin usar el resumen de cinco números.
+
+- Comparemoslo con el boxplot a traves de `cowplot`
 
 ```{r}
-#df_lapop$q1tb <- as.factor(df_lapop$q1tb)
+p1 <- df_lapop |> # Boxplot
+  ggplot(aes(x = sex , y = confi_ins, color = sex)) +
+  geom_boxplot() +
+  theme(legend.position = "bottom") + 
+  geom_dotplot(binaxis = 'y',
+               stackdir = 'center',
+               dotsize = 0.5)
 
-#bp2 <- ggplot(df_lapop, aes(x = q1tb, y = confi_ins, color = q1tb))
+
+p2 <- df_lapop |> # Violin plot
+  ggplot(aes(x = sex , y = confi_ins, color = sex)) +
+  geom_violin()  +
+  theme(legend.position = "bottom") + 
+  geom_dotplot(binaxis = 'y',
+               stackdir = 'center',
+               dotsize = 0.5)
+
+plot_grid(p1, p2) # Comparamos ambas gráficas
 ```
+
+## Ridgeline Plots: `ggridges`
+
+-  Útil para la visualización compacta y la comparación de distribuciones.
+```{r}
+p3 <- df_lapop |>
+  ggplot(aes(x =  confi_ins, y =  sex, color = sex)) +
+  geom_density_ridges(alpha = 0.5)
+p3 
+```
+
+### Ahora, compara los 3 gráficos en un solo plot:
+
+  - Hint: `cowplot`
+
+
+# Bibliografía:
+
+Ritchey, F. (2006). Estadística para las ciencias sociales. México: Mc Gray Hill 
+Interamericana. Cap.3,4,5). http://metodos-avanzados.sociales.uba.ar/wp-content/uploads/sites/216/2021/07/Ritchey-2002_Teorica.pdf
+
+De la puente, C. (2015). Estadística y Gráficos. Estadística aplicada a las Ciencias Sociales - Videotutoriales de enseñanza-aprendizaje. [Diapositivas](https://hdl.handle.net/20.500.14352/25438)
+
+
+Ballesteros, E. (2015). Estadística descriptiva univariante mediante el gráfico de caja y bigotes. Estadística aplicada a las Ciencias Sociales - Videotutoriales de enseñanza-aprendizaje.  [Diapositivas](https://hdl.handle.net/20.500.14352/25438)
+
+
+# Más recursos:
+
+- [From Data to Viz](https://www.data-to-viz.com/)
+
+- [THE ISSUE WITH PIE CHART](https://www.data-to-viz.com/caveat/pie.html)
+
+- [Opciones de fragmento y opciones de paquete](https://yihui.org/knitr/options/)
+
+NOTA: 
+
+FALTA CORREGIR ALGUNAS COSAS
+
+
+
+
 
 
 
